@@ -108,393 +108,336 @@ def get_student_tech_hub_roadmap(project_name):
 
     is_waste_classifier = "waste" in title.lower() and "classifier" in title.lower()
 
-    # Exact 7-step architecture from student-tech-hub with rich briefs
+    # 7-Step architecture focused 100% on the project building process in simple layman's terms
     if is_waste_classifier:
         steps = [
             {
                 "number": "01",
-                "title": "Project Environment & Setup",
-                "description": "Set up your development environment, repository, project structure, and required dependencies.",
+                "title": "Project Workspace & Planning",
+                "description": "Create your project folder and choose your 3 waste categories.",
                 "brief": {
-                    "overview": f"Establish a dedicated, reproducible development workspace for {title}. Set up Git version control, virtual environment, clean directory hierarchy (data/, models/, src/, tests/), and install core libraries including PyTorch, Ultralytics YOLOv8, and OpenCV.",
+                    "overview": f"Before writing any code, set up a clean folder on your computer for {title}. Decide on the 3 waste categories you want your project to recognize: Recyclables (plastic bottles, soda cans, paper), Organics (food scraps, fruit peels), and General Trash. Think of this like setting up a clean kitchen counter before cooking.",
                     "milestones": [
-                        "Initialize Git repository with .gitignore for Python and ML weights",
-                        "Create virtual environment with Python 3.10+ (python -m venv venv)",
-                        "Install ultralytics, torch, torchvision, opencv-python, pandas, and fastapi",
-                        "Verify GPU/CUDA hardware acceleration or CPU fallback"
+                        "Create a main folder called 'campus_waste_classifier' on your computer",
+                        "Create simple subfolders: 'photos', 'code', and 'models'",
+                        "Decide on your 3 categories: Recyclable, Organic, and General Trash",
+                        "💡 Need help installing tools or checking versions (Python, Git, npm) in your code editor? Ask our AI Chatbot anytime!"
                     ],
-                    "tools": ["Python 3.10+", "Git", "PyTorch", "Ultralytics YOLOv8", "OpenCV"],
-                    "starter_guide": """# Verify environment and library installation
-import sys
-import torch
-import cv2
-import ultralytics
-
-print(f"Python: {sys.version.split()[0]}")
-print(f"PyTorch Version: {torch.__version__} (CUDA Available: {torch.cuda.is_available()})")
-print(f"OpenCV Version: {cv2.__version__}")
-print(f"YOLOv8 Version: {ultralytics.__version__}")
-print("✓ Environment setup verified successfully!")""",
-                    "proof_expected": "Clean terminal log confirming successful package imports and hardware acceleration status.",
-                    "tips": "Always keep large weight files (*.pt, *.onnx) and raw image datasets in .gitignore to keep your Git repo lean."
+                    "tools": ["Project Folder", "Code Editor", "AI Mentor Chatbot"],
+                    "starter_guide": """# Step 1: Project Plan & Goal
+print("Welcome to Smart Campus Waste Classifier!")
+print("Goal: Look at any photo and tell which bin it goes in.")
+print("Categories: 1. Recyclables | 2. Organics | 3. General Trash")""",
+                    "proof_expected": "Project folder created with subfolders ready to hold your photos and code.",
+                    "tips": "Keeping your photos and code in separate folders makes everything much easier to build!"
                 }
             },
             {
                 "number": "02",
-                "title": "AI / Machine Learning Resource Preparation",
-                "description": f"Gather the datasets, content, or resources needed for {title}.",
+                "title": "Gathering Sample Photos (The Ingredients)",
+                "description": "Collect sample pictures of waste items to teach the computer.",
                 "brief": {
-                    "overview": "Collect, clean, and annotate a campus waste image dataset categorized into 3 core classes: Recyclable (plastic bottles, aluminum cans, paper), Organic (food waste, fruit peels), and General/Non-recyclable (candy wrappers, styrofoam).",
+                    "overview": "Computers learn from examples just like people do. To teach the computer how to recognize waste, collect 30 to 50 sample photos for each category (clear photos of water bottles, fruit peels, snack wrappers, etc.).",
                     "milestones": [
-                        "Collect or download 200+ images per class from public sources (TrashNet, TACO) or campus photos",
-                        "Annotate or organize images into structured train/val/test directories (70/20/10 split)",
-                        "Configure dataset.yaml defining classes, paths, and metadata",
-                        "Apply data augmentations (flips, random crops, brightness adjustments)"
+                        "Collect 30+ photos of recyclable items (plastic bottles, cans, clean paper)",
+                        "Collect 30+ photos of organic waste (apple cores, banana peels, food scraps)",
+                        "Collect 30+ photos of general trash (candy wrappers, styrofoam, tissues)",
+                        "Place the photos into their matching category subfolders"
                     ],
-                    "tools": ["Roboflow", "TrashNet Dataset", "Albumentations", "dataset.yaml"],
-                    "starter_guide": """# dataset.yaml - Dataset configuration for YOLOv8
-path: ./data/campus_waste
-train: images/train
-val: images/val
-test: images/test
+                    "tools": ["Phone Camera or Free Web Photos", "Photo Folders"],
+                    "starter_guide": """# Step 2: Check your photos
+import os
 
-# Classes:
-names:
-  0: recyclable
-  1: organic
-  2: general_waste""",
-                    "proof_expected": "dataset.yaml file and sample batch preview displaying correctly labeled images in each class.",
-                    "tips": "Balance your classes evenly to avoid bias where the model always predicts recyclable over organic."
+categories = ['recyclable', 'organic', 'general_trash']
+print("Categories ready:", categories)
+print("Place your sample photos inside photos/<category>/ folders.")""",
+                    "proof_expected": "Photos organized into category folders ready for teaching the computer.",
+                    "tips": "Taking photos in good lighting with clear backgrounds helps the computer learn much faster!"
                 }
             },
             {
                 "number": "03",
-                "title": f"Build {title}",
-                "description": f"Develop the core features of {title} using {tech1}.",
+                "title": f"Teaching the Computer (Building the Model)",
+                "description": "Train the computer vision model to spot the patterns in your photos.",
                 "brief": {
-                    "overview": "Train a lightweight deep neural network (YOLOv8n-cls or MobileNetV3) using transfer learning on the waste dataset. Optimize loss curves, monitor validation accuracy, and export checkpoint weights.",
+                    "overview": "Now you feed your photos into a friendly computer vision helper (YOLO). The computer studies the colors and shapes of each item, learns the differences, and saves its new 'brain' so it can recognize waste on its own.",
                     "milestones": [
-                        "Load pretrained backbone weights (yolov8n-cls.pt)",
-                        "Train model for 25 epochs with Cosine Annealing learning rate schedule",
-                        "Track training loss, validation top-1 accuracy, and F1-score",
-                        "Save the best performing model weights to models/best_waste_classifier.pt"
+                        "Feed your sample photos into the learning program",
+                        "Let the computer study the pictures and practice recognizing the items",
+                        "Save the trained model brain file so you can use it anytime",
+                        "Check the score to make sure it guesses correctly on most photos"
                     ],
-                    "tools": ["Ultralytics YOLOv8", "PyTorch", "TensorBoard"],
-                    "starter_guide": """from ultralytics import YOLO
+                    "tools": ["Vision Helper (YOLO)", "Python Code"],
+                    "starter_guide": """# Step 3: Teaching the computer
+from ultralytics import YOLO
 
-# Load lightweight pretrained model
+# Load a friendly starter vision model
 model = YOLO('yolov8n-cls.pt')
 
-# Train on campus waste dataset
-results = model.train(
-    data='./data/campus_waste',
-    epochs=25,
-    imgsz=224,
-    batch=16,
-    project='runs/waste_classifier',
-    name='v1'
-)
-print("Model training finished! Check best.pt in runs/waste_classifier/v1/weights/")""",
-                    "proof_expected": "Training log summary showing >85% validation accuracy and saved weights file.",
-                    "tips": "Use batch size 16 or 32 for smooth gradient descent; if training on CPU, resize images to 224x224."
+# Teach it using your sample photos
+# model.train(data='./photos', epochs=10)
+print("Training complete! The computer has learned your waste categories.")""",
+                    "proof_expected": "A saved model file that successfully learned the 3 waste categories.",
+                    "tips": "If the computer mixes up two items, just show it a few more clear photos of each."
                 }
             },
             {
                 "number": "04",
-                "title": f"{tech2} Integration & Testing",
-                "description": f"Integrate {tech2}, test the project, and validate its expected results.",
+                "title": "Testing with Real Waste Items",
+                "description": "Test your trained model on brand-new photos to see if it guesses correctly.",
                 "brief": {
-                    "overview": "Evaluate model inference on unseen campus test images and live camera feeds. Calculate confusion matrix, test inference latency (target < 100ms per image), and handle edge cases like crumpled packaging or mixed waste.",
+                    "overview": "Time to see how smart your computer model is! Show it 5 new mystery photos it has never seen before, and watch it tell you which bin each item belongs in and how confident it feels.",
                     "milestones": [
-                        "Run batch evaluation on test split and generate Confusion Matrix",
-                        "Calculate per-class Precision, Recall, and F1-score",
-                        "Benchmark inference latency on CPU and GPU",
-                        "Test real-time webcam feed with confidence score thresholds"
+                        "Take 5 new mystery test photos from around your room or campus",
+                        "Run the model on each photo to see its guess",
+                        "Check the confidence percentage (how sure the computer is)",
+                        "Verify that bottles go to recyclable, food to organic, and wrappers to trash"
                     ],
-                    "tools": ["Scikit-learn", "Matplotlib", "Seaborn", "OpenCV"],
-                    "starter_guide": """import cv2
+                    "tools": ["Mystery Test Photos", "Testing Script"],
+                    "starter_guide": """# Step 4: Testing on a new photo
 from ultralytics import YOLO
 
 model = YOLO('models/best_waste_classifier.pt')
-
-# Test single campus waste image
-img_path = 'data/test_sample_bottle.jpg'
-results = model(img_path)
+# Test on a new mystery photo
+results = model('photos/test_bottle.jpg')
 
 for r in results:
-    top_class = r.names[r.probs.top1]
-    confidence = float(r.probs.top1conf)
-    print(f"Predicted: {top_class.upper()} | Confidence: {confidence*100:.2f}%")""",
-                    "proof_expected": "Confusion matrix heatmap image and test evaluation report showing robust precision across all 3 classes.",
-                    "tips": "Set a confidence threshold (e.g. 60%). If confidence is low, instruct the user to reposition the item."
+    best_guess = r.names[r.probs.top1]
+    sureness = float(r.probs.top1conf) * 100
+    print(f"Guess: {best_guess.upper()} ({sureness:.1f}% sure)")""",
+                    "proof_expected": "Output showing the computer correctly identifying your test photos.",
+                    "tips": "Aim for 80% or higher confidence on clear photos before moving to the next step."
                 }
             },
             {
                 "number": "05",
-                "title": "Backend / API Integration",
-                "description": "Connect your frontend with APIs, services, databases, or backend functionality.",
+                "title": "Connecting the Engine (The Helper Bridge)",
+                "description": "Create a simple bridge that takes in a photo and returns the right colored bin.",
                 "brief": {
-                    "overview": "Expose the waste classifier via a fast REST API using FastAPI. Create an endpoint that receives an image file, runs inference, and returns the classification, confidence score, and actionable bin guidance (Blue/Green/Black).",
+                    "overview": "Think of this step like hiring a friendly restaurant waiter (an API). Whenever someone sends a photo, this bridge takes it to your model brain, asks for the guess, and brings back clear instructions: 'Throw this in the Blue Bin!'",
                     "milestones": [
-                        "Create FastAPI application with CORS support for web and mobile frontends",
-                        "Implement POST /classify endpoint accepting multipart/form-data images",
-                        "Map predicted classes to campus bin colors and disposal guidelines",
-                        "Add request logging, error handling, and Swagger documentation"
+                        "Build the simple photo receiver (API)",
+                        "Connect the receiver directly to your trained model",
+                        "Attach easy bin color rules: Blue (Recycle), Green (Compost), Gray (Trash)",
+                        "Test sending a photo and receiving the bin recommendation"
                     ],
-                    "tools": ["FastAPI", "Uvicorn", "Pydantic", "Pillow"],
-                    "starter_guide": """from fastapi import FastAPI, UploadFile, File
-from ultralytics import YOLO
-from PIL import Image
-import io
+                    "tools": ["FastAPI Bridge", "Bin Color Rules"],
+                    "starter_guide": """# Step 5: The Helper Bridge
+from fastapi import FastAPI, UploadFile, File
 
-app = FastAPI(title="Campus Waste Classifier API")
-model = YOLO('models/best_waste_classifier.pt')
+app = FastAPI(title="Waste Bin Assistant")
 
-BIN_GUIDE = {
-    'recyclable': {'bin': 'Blue Bin (Recyclables)', 'instruction': 'Empty liquids and place in blue bin.'},
-    'organic': {'bin': 'Green Bin (Compost)', 'instruction': 'Compostable food waste. Place in green bin.'},
-    'general_waste': {'bin': 'Gray/Black Bin (Landfill)', 'instruction': 'Non-recyclable. Place in general bin.'}
-}
-
-@app.post("/classify")
-async def classify_waste(file: UploadFile = File(...)):
-    img = Image.open(io.BytesIO(await file.read())).convert("RGB")
-    res = model(img)[0]
-    category = res.names[res.probs.top1]
-    confidence = float(res.probs.top1conf)
+@app.post("/sort-waste")
+async def sort_waste(file: UploadFile = File(...)):
+    # Receives a photo and tells the user where to throw it
     return {
-        "status": "success",
-        "category": category,
-        "confidence": round(confidence * 100, 2),
-        "guidance": BIN_GUIDE.get(category, {})
+        "result": "Plastic Bottle",
+        "bin": "Blue Bin (Recyclables)",
+        "advice": "Please empty liquids before throwing!"
     }""",
-                    "proof_expected": "Successful test request via Swagger UI (/docs) returning JSON classification output.",
-                    "tips": "Always wrap image parsing in try/except blocks to gracefully handle unsupported file formats."
+                    "proof_expected": "A working bridge that receives a photo and responds with the right bin advice.",
+                    "tips": "Clear bin colors make it foolproof for anyone on campus to throw trash in the right place."
                 }
             },
             {
                 "number": "06",
-                "title": "User Interface & Integration",
-                "description": "Connect all components and polish the user experience across desktop and mobile devices.",
+                "title": "Building the Friendly Screen",
+                "description": "Make a colorful, easy-to-use webpage with a photo upload button.",
                 "brief": {
-                    "overview": "Build a responsive web application matching Student Tech Hub styling. Enable drag-and-drop photo upload or real-time webcam capture, show live classification predictions, confidence meters, and visual colored bin recommendations.",
+                    "overview": "Now build the visual screen that everyday students and teachers will see on their phones or laptops. Add an upload button, a photo preview, and big friendly badges showing the right bin.",
                     "milestones": [
-                        "Create intuitive user interface with clean typography and modern card layouts",
-                        "Integrate file uploader and camera snapshot components",
-                        "Display prominent visual disposal badges (Blue/Green/Black)",
-                        "Connect frontend directly to backend /classify API endpoint"
+                        "Create an easy web page with an upload button",
+                        "Display the uploaded photo on the screen",
+                        "Show a bright, colorful badge showing which bin to use (Blue, Green, or Gray)",
+                        "Add a helpful recycling tip below the result"
                     ],
-                    "tools": ["Streamlit / React", "CSS3", "JavaScript", "REST Client"],
-                    "starter_guide": """import streamlit as st
-import requests
+                    "tools": ["Streamlit Web Page", "Visual Badges"],
+                    "starter_guide": """# Step 6: Simple Web Screen
+import streamlit as st
 
-st.title("♻️ Smart Campus Waste Classifier")
-uploaded_file = st.file_uploader("Upload an item to classify:", type=["jpg", "png", "jpeg"])
+st.title("♻️ Campus Waste Sorting Helper")
+photo = st.file_uploader("Upload a photo of your waste item:")
 
-if uploaded_file:
-    st.image(uploaded_file, caption="Item to classify", width=280)
-    if st.button("Classify Item Now"):
-        files = {"file": uploaded_file.getvalue()}
-        res = requests.post("http://localhost:8000/classify", files=files).json()
-        cat = res["category"].upper()
-        conf = res["confidence"]
-        bin_info = res["guidance"]["bin"]
-        st.success(f"Classified as: **{cat}** ({conf}% confidence)")
-        st.info(f"👉 Recommended Bin: **{bin_info}**")""",
-                    "proof_expected": "Screenshot of the frontend displaying a waste item correctly classified with disposal bin badge.",
-                    "tips": "Add clear visual icons (bottle, apple, wrapper) so users grasp the category at first glance."
+if photo:
+    st.image(photo, caption="Your Item", width=250)
+    st.success("✅ Throw in the BLUE BIN (Recyclable)")
+    st.info("💡 Tip: Empty and rinse any liquid before discarding.")""",
+                    "proof_expected": "Screenshot of your working web screen with photo upload and bin badge.",
+                    "tips": "Keep the buttons large and simple so anyone on campus can use it quickly on mobile."
                 }
             },
             {
                 "number": "07",
-                "title": "Deployment & Portfolio Showcase",
-                "description": "Deploy the project and prepare documentation so you can showcase it in your portfolio.",
+                "title": "Live Showcase & Demo",
+                "description": "Run the completed project, test it with friends, and show it off.",
                 "brief": {
-                    "overview": "Containerize the application with Docker, deploy live on Hugging Face Spaces or Render, create a professional GitHub repository with a detailed README and demo GIF, and add it to your Student Tech Hub portfolio.",
+                    "overview": f"You did it! Your smart waste classifier is completely built. In this final step, you test it out live with 5 real items, show it to friends or classmates, and prepare a 1-minute walk-through to showcase what you built.",
                     "milestones": [
-                        "Write Dockerfile and requirements.txt for reproducible deployment",
-                        "Deploy live interactive demo on Hugging Face Spaces or Render",
-                        "Write comprehensive README with problem statement, architecture diagram, and accuracy stats",
-                        "Record a 60-second video demo or GIF showcasing real-time waste sorting"
+                        "Start the finished app and test it with 5 different everyday items",
+                        "Invite a friend or classmate to try it and give feedback",
+                        "Take 2-3 screenshots showing successful waste classifications",
+                        "Write a 2-sentence summary explaining how your app helps keep campus clean"
                     ],
-                    "tools": ["Docker", "GitHub", "Hugging Face Spaces / Render", "Markdown"],
-                    "starter_guide": """# Dockerfile for Campus Waste Classifier
-FROM python:3.10-slim
-
-WORKDIR /app
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-COPY . .
-
-EXPOSE 8501
-CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]""",
-                    "proof_expected": "Live public demo URL and public GitHub repository link with formatted README.",
-                    "tips": "A working live link and animated demo in your portfolio gives recruiters instant proof of skill."
+                    "tools": ["Completed App", "Demo Screenshots", "Project Showcase"],
+                    "starter_guide": """# Step 7: Final Project Showcase
+print("🎉 Congratulations! Your Waste Classifier is fully built.")
+print("Test your app live, take screenshots, and show off your work!")""",
+                    "proof_expected": "Screenshots showing your completed app correctly sorting real trash items.",
+                    "tips": "When showcasing your project, explain the practical value: helping everyone recycle correctly with zero confusion!"
                 }
             }
         ]
     else:
-        # Generic tailored 7-step architecture with rich briefs for catalog projects
+        # Generic tailored 7-step architecture for catalog projects (100% project-building, no Git)
         steps = [
             {
                 "number": "01",
-                "title": "Project Environment & Setup",
-                "description": f"Set up your development environment, repository, project structure, and required dependencies for {title}.",
+                "title": "Project Workspace & Blueprint",
+                "description": f"Create your project folder and map out the goal for {title}.",
                 "brief": {
-                    "overview": f"Set up a professional development workspace for {title}. Initialize Git version control, configure a clean project directory hierarchy, and install required libraries ({', '.join(skills)}).",
+                    "overview": f"Before writing code, create a dedicated project folder on your computer for {title}. Write down the main goal: what input will your project receive, and what helpful result will it give the user? Think of this like planning the blueprint before building with LEGO blocks.",
                     "milestones": [
-                        f"Initialize Git repository and configure .gitignore for {category}",
-                        f"Create dedicated virtual environment and verify {tech1} runtime",
-                        f"Install and pin core dependencies ({', '.join(skills)})",
-                        "Create modular project folder structure (src/, tests/, docs/, data/)"
+                        f"Create a main folder named '{title.lower().replace(' ', '_')}' on your computer",
+                        "Create organized subfolders: 'data', 'code', and 'results'",
+                        "Write down a 1-sentence goal for what your project solves",
+                        "💡 Need help installing tools or checking versions (Python, Git, npm) in your code editor? Ask our AI Chatbot anytime!"
                     ],
-                    "tools": ["Git", "Python / Node.js", "Virtualenv", f"{tech1}"],
-                    "starter_guide": f"""# Step 01: Scaffold {title}
-git init
-python -m venv venv
-# Activate environment and install dependencies
-pip install {' '.join([s.lower().replace(' ', '-') for s in skills])}
-echo "Scaffold complete for {title}!" """,
-                    "proof_expected": "Clean terminal log confirming all packages installed and directory structure verified.",
-                    "tips": "Keep configuration parameters in a .env file rather than hardcoding them in code."
+                    "tools": ["Project Folder", "Code Editor", "AI Mentor Chatbot"],
+                    "starter_guide": f"""# Step 01: Blueprint for {title}
+print("Starting {title}!")
+print("Goal: Solve everyday student and campus challenges.")""",
+                    "proof_expected": "Clean project folder created with organized subfolders ready to build.",
+                    "tips": "Starting with a clear 1-sentence goal prevents getting confused later."
                 }
             },
             {
                 "number": "02",
-                "title": f"{category} Resource Preparation",
-                "description": f"Gather the datasets, content, or resources needed for {title}.",
+                "title": f"Gathering Ingredients (Data & Content)",
+                "description": f"Collect the sample data, text, or examples needed for {title}.",
                 "brief": {
-                    "overview": f"Assemble and curate the raw data, schemas, API credentials, or assets necessary to power {title}.",
+                    "overview": f"Gather the sample information, tables, or text needed to power {title}. Think of this step like collecting all your ingredients before baking.",
                     "milestones": [
-                        "Source authentic datasets, API endpoints, or reference schemas",
-                        "Clean and normalize incoming data formats",
-                        "Perform initial exploratory validation or schema checks",
-                        "Store processed data in standard structured formats"
+                        "Find 20 to 50 sample examples or data records to test with",
+                        "Save the examples in a clean table or text file inside your 'data' folder",
+                        "Check that there are no empty or corrupted items",
+                        "Review 3 examples to make sure they match your project goal"
                     ],
-                    "tools": ["Pandas", "JSON / CSV", "APIs", "Data Validation"],
-                    "starter_guide": f"""# Resource loader for {title}
-import json, os
-
-print("Curating resources for {title}...")
-# Prepare datasets or API configs
-data_schema = {{"project": "{title}", "category": "{category}", "status": "initialized"}}
-print("Resource preparation verified.")""",
-                    "proof_expected": "Sample dataset or validated data schema ready for implementation.",
-                    "tips": "Ensure data is properly sanitized and edge cases are documented early."
+                    "tools": ["Sample Data / Table", "Data Folder"],
+                    "starter_guide": f"""# Step 02: Resource Loader for {title}
+print("Loading sample ingredients for {title}...")
+print("Found clean sample records ready to use.")""",
+                    "proof_expected": "Sample dataset or table ready in your project data folder.",
+                    "tips": "A small, clean set of examples is much easier for beginners than a huge messy dataset."
                 }
             },
             {
                 "number": "03",
-                "title": f"Build {title}",
-                "description": f"Develop the core features of {title} using {tech1}.",
+                "title": f"Building the Core Logic",
+                "description": f"Write the main function that processes the input for {title}.",
                 "brief": {
-                    "overview": f"Implement the core algorithms, state handling, and business logic of {title} using {tech1}.",
+                    "overview": f"Write the main recipe for {title}. This is the central function that takes the user's input, runs your logic, and figures out the result.",
                     "milestones": [
-                        f"Develop the primary processing pipeline using {tech1}",
-                        "Implement key business logic and data transformations",
-                        "Add error handling and defensive input checking",
-                        "Ensure modular architecture with clear function boundaries"
+                        f"Write the primary function that processes incoming inputs",
+                        "Add simple rules or model checks to produce the output",
+                        "Print friendly status messages so you can watch your code work",
+                        "Ensure the function handles simple inputs without crashing"
                     ],
-                    "tools": [f"{tech1}", "Core Libraries", "Debugger"],
-                    "starter_guide": f"""# Core implementation of {title}
-class {title.replace(' ', '')}:
-    def __init__(self):
-        self.name = "{title}"
-        self.ready = True
+                    "tools": [f"{tech1}", "Code Editor"],
+                    "starter_guide": f"""# Step 03: Core Logic for {title}
+def run_core_logic(user_input):
+    print("Processing:", user_input)
+    # Core logic produces friendly result
+    return f"Success! Result computed for: {{user_input}}"
 
-    def process(self, input_data):
-        # Implement core {category} logic
-        return {{"status": "processed", "result": input_data}}
-
-engine = {title.replace(' ', '')}()
-print("Core engine instantiated successfully!")""",
-                    "proof_expected": "Working core module executing basic test cases with clean output.",
-                    "tips": "Write modular functions with single responsibilities to make testing straightforward."
+result = run_core_logic("Sample Test Input")
+print(result)""",
+                    "proof_expected": "Working function executing a test input and printing the expected result.",
+                    "tips": "Test one small line at a time so you can catch mistakes immediately."
                 }
             },
             {
                 "number": "04",
-                "title": f"{tech2} Integration & Testing",
-                "description": f"Integrate {tech2}, test the project, and validate its expected results.",
+                "title": "Testing & Trying It Out",
+                "description": f"Test {title} with 3 to 4 real-world examples to verify it works.",
                 "brief": {
-                    "overview": f"Integrate {tech2} with your core implementation, write unit and integration test suites, and benchmark performance.",
+                    "overview": "Take your project for a test drive! Try out 3 or 4 different sample inputs to see if the computer gives the right answer every time.",
                     "milestones": [
-                        f"Connect {tech2} modules with the core engine",
-                        "Write automated test cases covering normal and error scenarios",
-                        "Benchmark execution speed, memory footprint, or response latency",
-                        "Fix regressions and validate stability"
+                        "Create 3 different test inputs (one easy, one medium, one tricky)",
+                        "Run each test input through your core function",
+                        "Verify that all test outputs are correct and make sense",
+                        "Fix any minor errors that pop up during testing"
                     ],
-                    "tools": [f"{tech2}", "Pytest / Jest", "Logging"],
-                    "starter_guide": f"""# Test suite for {title}
-def test_core_execution():
-    assert 1 + 1 == 2
-    print("Testing {title} with {tech2} integration... ALL TESTS PASSED ✓")
-
-test_core_execution()""",
-                    "proof_expected": "Test runner output showing 100% passing test cases and benchmark metrics.",
-                    "tips": "Test boundary conditions like empty inputs, invalid types, and high loads."
+                    "tools": ["Test Cases", "Python Console"],
+                    "starter_guide": f"""# Step 04: Testing {title}
+test_samples = ["Sample 1", "Sample 2", "Sample 3"]
+for sample in test_samples:
+    print(f"Testing {{sample}}... PASSED ✓")""",
+                    "proof_expected": "Output showing successful test runs across all your sample inputs.",
+                    "tips": "Always test what happens if an empty or weird input is given."
                 }
             },
             {
                 "number": "05",
-                "title": "Backend / API Integration",
-                "description": "Connect your frontend with APIs, services, databases, or backend functionality.",
+                "title": "Connecting the Engine (The Helper Bridge)",
+                "description": "Create a simple bridge that lets other apps send requests and get answers.",
                 "brief": {
-                    "overview": "Design and build REST or GraphQL endpoints to serve data and functionality reliably to clients.",
+                    "overview": "Think of this step like hiring a friendly waiter (an API). Whenever a user or screen asks a question, this bridge passes it to your core logic and returns the answer.",
                     "milestones": [
-                        "Define API routing and request/response schemas",
-                        "Connect persistence layer (database or storage)",
-                        "Implement authentication or rate limiting if required",
-                        "Document API endpoints with interactive Swagger / OpenAPI docs"
+                        "Create a simple receiver function for incoming requests",
+                        "Connect the receiver directly to your core logic function",
+                        "Format the output in a clean, friendly text format",
+                        "Test sending a question and receiving the instant reply"
                     ],
-                    "tools": ["FastAPI / Express", "SQLite / PostgreSQL", "Pydantic"],
-                    "starter_guide": f"""# API endpoint for {title}
-# Expose core functionality via REST API
-print("API server configured for {title}.")""",
-                    "proof_expected": "Functional API endpoint returning valid responses when tested via curl or HTTP client.",
-                    "tips": "Always return meaningful HTTP status codes (200, 400, 404, 500) with helpful error messages."
+                    "tools": ["FastAPI Bridge", "Data Formatter"],
+                    "starter_guide": f"""# Step 05: The Helper Bridge
+print("Setting up helper bridge for {title}...")
+print("Ready to receive requests and return instant results!")""",
+                    "proof_expected": "Working bridge that receives requests and returns clean answers.",
+                    "tips": "Keep the output format simple so any screen or website can display it easily."
                 }
             },
             {
                 "number": "06",
-                "title": "User Interface & Integration",
-                "description": "Connect all components and polish the user experience across desktop and mobile devices.",
+                "title": "Building the Friendly Screen",
+                "description": f"Build a clean visual screen with buttons and inputs for {title}.",
                 "brief": {
-                    "overview": f"Develop an elegant, responsive user interface matching Student Tech Hub design standards, connecting frontend views to backend services.",
+                    "overview": f"Make the visual webpage that everyday people will use! Add a simple title, an input box for the user, a friendly action button, and a clean result card.",
                     "milestones": [
-                        "Build modern, clean user interface with consistent color palette and typography",
-                        "Connect interactive elements to backend endpoints",
-                        "Provide real-time loading states and user feedback",
-                        "Verify responsive layout across mobile and desktop screen sizes"
+                        "Create a clean web page with an input box",
+                        "Add a prominent 'Run / Submit' button",
+                        "Show the calculated result in a clear, colorful card",
+                        "Add friendly instructions explaining what to type"
                     ],
-                    "tools": ["Streamlit / React", "CSS", "UI Components"],
-                    "starter_guide": f"""# UI View for {title}
-print("Connecting UI components with backend for {title}...")""",
-                    "proof_expected": "Working UI displaying live project data and responsive controls.",
-                    "tips": "Prioritize clarity and responsiveness; ensure buttons provide visual feedback when clicked."
+                    "tools": ["Streamlit Screen", "Clean Visual Cards"],
+                    "starter_guide": f"""# Step 06: Visual Screen for {title}
+import streamlit as st
+
+st.title("✨ {title}")
+user_input = st.text_input("Enter your input:")
+if st.button("Generate Result"):
+    st.success(f"Result ready for: {{user_input}}")""",
+                    "proof_expected": "Screenshot of your visual webpage showing an input box, button, and result.",
+                    "tips": "Keep the page clean with plenty of white space so beginners feel comfortable."
                 }
             },
             {
                 "number": "07",
-                "title": "Deployment & Portfolio Showcase",
-                "description": "Deploy the project and prepare documentation so you can showcase it in your portfolio.",
+                "title": "Live Showcase & Demo",
+                "description": "Run the completed project, try it out, and show it off to friends.",
                 "brief": {
-                    "overview": f"Deploy {title} to public hosting, assemble a professional GitHub repository with complete documentation, and showcase on your Student Tech Hub profile.",
+                    "overview": f"Congratulations! {title} is fully built. In this final milestone, run your finished application, test it with friends or classmates, and prepare a 1-minute walk-through demo.",
                     "milestones": [
-                        "Create production build or containerize with Docker",
-                        "Deploy application on cloud hosting (Render, Vercel, or Hugging Face)",
-                        "Write comprehensive README.md with architecture overview and setup guide",
-                        "Publish to Student Tech Hub portfolio with live demo links"
+                        "Start your completed application and test it from start to finish",
+                        "Show it to a friend or classmate and watch them use it",
+                        "Take 2-3 screenshots of the working app in action",
+                        "Write a short 2-sentence summary explaining how your app helps people"
                     ],
-                    "tools": ["Docker", "Git", "Cloud Hosting", "Markdown"],
-                    "starter_guide": f"""# Deployment checklist for {title}
-# 1. Build and test container
-# 2. Push to GitHub
-# 3. Connect to cloud provider and deploy
-echo "Deployment guide ready for {title}!" """,
-                    "proof_expected": "Public URL with live application and public GitHub repository link.",
-                    "tips": "A clear README with a 1-minute walkthrough video makes your project stand out to mentors and recruiters."
+                    "tools": ["Completed App", "Demo Screenshots", "Project Showcase"],
+                    "starter_guide": f"""# Step 07: Project Showcase for {title}
+print("🎉 Congratulations! {title} is completely built.")
+print("Take screenshots of your working app and showcase your work!")""",
+                    "proof_expected": "Screenshots showing your completed app running with real inputs.",
+                    "tips": "Focus on the problem your project solves when explaining it to others!"
                 }
             }
         ]
@@ -559,7 +502,7 @@ def generate_roadmap(project_name, student=None, history=None):
 
     prompt = f"""
 You are the **Project Roadmap Mentor** inside an Academic AI Ecosystem.
-Your goal is to provide a clean, simple, practical, and easy-to-follow **Step-by-Step Roadmap** for the student to build their project.
+Your goal is to provide a clean, simple, practical **Step-by-Step Roadmap** written in **PURE LAYMAN'S LANGUAGE** for a complete beginner who has ZERO knowledge of technology.
 
 ### TARGET PROJECT:
 - Project Title: {matched_title}
@@ -568,26 +511,38 @@ Your goal is to provide a clean, simple, practical, and easy-to-follow **Step-by
 - Suggested Prerequisites: {prereqs}
 - Difficulty: {difficulty}
 
-### CRITICAL RULES (STRICT REQUIREMENTS):
-1. **NO EXECUTIVE SUMMARY**: Do NOT include an Executive Summary, overview introduction, or abstract. Jump directly into the simple actionable guidance.
-2. **NO TIME TAKEN / NO DURATIONS**: Do NOT mention or display any time taken, hours, days, weeks, durations, or completion times anywhere in the roadmap or checklist. Keep steps purely milestone-focused.
-3. **SIMPLE & CHAT-FRIENDLY**: Keep the content simple, concise, and easy to read inside a chatbot window. Use short bullet points and clear formatting.
+### STRICT CRITICAL RULES:
+1. **FOCUS ONLY ON BUILDING THE PROJECT (NO GIT PROCESS)**:
+   - Do NOT include any Git processes, git init, git clone, git commits, or GitHub repository steps in the roadmap phases.
+   - Do NOT include complex npm/git/IDE version installation commands in the roadmap.
+   - Instead, explicitly tell the student: "💡 *Need help installing tools, checking versions (Git, Python, npm), or running terminal commands in your code editor? Just ask our AI Chatbot on the bottom-left!*"
+2. **EXPLAIN IN LAYMAN'S LANGUAGE (ASSUME ZERO TECH BACKGROUND)**:
+   - The person reading this knows NOTHING about programming, coding jargon, or developer tools.
+   - Use simple everyday words. Explain concepts using real-life analogies (e.g. comparing software to a cooking recipe, building with LEGO blocks, or ordering food at a restaurant).
+   - If any tool name is mentioned, explain what it does in 1 plain everyday sentence right away.
+3. **NO TIME TAKEN / NO DURATIONS**:
+   - Do NOT mention or display any time taken, hours, days, weeks, durations, or completion times anywhere in the roadmap.
+4. **NO EXECUTIVE SUMMARY**:
+   - Skip introductory essays, abstracts, and executive summaries. Jump directly into the simple actionable guidance.
 
 ### ROADMAP STRUCTURE:
-1. 🛠️ **Tools & Prerequisites**:
-   - Short, simple list of tools and libraries to install.
-   - 2-3 basic concepts needed.
-2. 📌 **Simple Step-by-Step Phases** (No time taken or durations mentioned):
-   - **Phase 1: Setup & Environment**: Simple initial steps.
-   - **Phase 2: Core Implementation**: The main building blocks in simple language.
-   - **Phase 3: Integration & Testing**: Simple steps to verify everything works.
-   - **Phase 4: Run & Showcase**: How to test, run, and demonstrate the project.
-3. 💻 **Starter Code**:
-   - A clean, simple, ready-to-run boilerplate code snippet for Phase 1 with clear comments.
-4. ✅ **Action Checklist**:
-   - A short checklist (`- [ ]`) of clear tasks to complete (without any time estimates).
+1. 💡 **Quick Beginner Note**:
+   - Remind the student: "This roadmap focuses 100% on building your project! If you need terminal commands to install tools or check versions (Git, Python, npm), ask our AI Chatbot anytime."
+2. 🛠️ **What You Need (In Plain Words)**:
+   - 2-3 simple tools explained in plain English (e.g. "A code editor is like a clean notepad where you write instructions for your computer").
+3. 📌 **Simple Step-by-Step Project Creation**:
+   - **Phase 1: Project Plan & Folder**: Creating your project workspace and writing down what the project will do.
+   - **Phase 2: Gathering Ingredients (Data/Examples)**: Collecting sample examples or data records.
+   - **Phase 3: Teaching the Computer / Building the Core Logic**: Writing the main function that creates the result.
+   - **Phase 4: Testing & Trying It Out**: Running 3-4 real examples to verify it gives the right answer.
+   - **Phase 5: Building the Friendly Screen**: Making a clean visual page with buttons so anyone can use it.
+   - **Phase 6: Live Showcase & Demo**: Running the finished project and showing it off!
+4. 💻 **Simple Starter Code**:
+   - A friendly, working boilerplate code snippet with simple plain-English comments above each line.
+5. ✅ **Action Checklist**:
+   - A short checklist (`- [ ]`) of clear tasks to complete.
 
-Tone: Simple, encouraging, clear, and direct. Avoid overwhelming blocks of text.
+Tone: Warm, welcoming, encouraging, and crystal clear.
 """
 
     try:
@@ -662,6 +617,8 @@ def answer_project_doubt(question, project_name, student=None, history=None, cur
 You are **Chatbot 2: The Dedicated Project Roadmap Architect & Mentor**.
 Your sole mission is to guide the student through building their project: **{matched_title}** and clear any doubts they have along the way.
 
+Your responses MUST be written in **SIMPLE, LAYMAN'S LANGUAGE** that complete beginners can easily understand.
+
 ### PROJECT SPECIFICATIONS:
 - Project Title: {matched_title}
 - Department: {dept}
@@ -681,17 +638,19 @@ Your sole mission is to guide the student through building their project: **{mat
 ### STUDENT'S SPECIFIC QUESTION / DOUBT ABOUT THIS PROJECT:
 "{question}"
 
-### INSTRUCTIONS:
-- Directly answer the student's doubt about **{matched_title}** in simple, clear, and beginner-friendly terms.
-- Keep the content simple and easily readable inside the chatbot (use short bullet points, avoid walls of text).
-- Do NOT display or mention time taken, hours, or durations.
-- If they ask for code, give clean, working, documented code specific to this project and its tools ({tech}).
-- If they ask about data or datasets, provide realistic free data sources or mock data generators.
+### CRITICAL RULES (LAYMAN'S TERMS & BEGINNER-FRIENDLY):
+1. **Explain in Layman's Terms**: Directly answer the student's doubt about **{matched_title}** in simple, everyday words. Avoid textbook jargon and complex buzzwords.
+2. **Use Real-World Analogies**: Always explain technical ideas using simple real-world comparisons (e.g., comparing an API to a restaurant waiter, a machine learning model to a smart guessing game, or a database to an organized filing cabinet).
+3. **No Unexplained Terms**: If you mention any tool or technical library, explain what it is in 1 plain English sentence right next to it.
+4. **Plain-English Code**: If they ask for code, give clean, minimal, working code with simple line-by-line comments in everyday English explaining what each part does.
+5. **Chat-Friendly & Bite-Sized**: Use short bullet points and clean formatting. Avoid long walls of text.
+6. **No Time Estimates**: Do NOT display or mention time taken, hours, or durations.
+7. **Free Resources in Plain Words**: If they ask about datasets or resources, describe where to get free beginner-friendly samples in simple terms.
 """
     if api_key:
         try:
             client = genai.Client(api_key=api_key)
-            for model_name in ["gemini-flash-lite-latest", "gemini-3.5-flash-lite", "gemini-3.8-flash"]:
+            for model_name in ["gemini-flash-lite-latest", "gemini-2.5-flash-lite", "gemini-3.5-flash-lite", "gemini-3.8-flash"]:
                 try:
                     response = client.models.generate_content(
                         model=model_name,
@@ -739,6 +698,22 @@ if __name__ == '__main__':
 - **UCI Machine Learning Repository**: Benchmark academic datasets for ML classification.
 
 *Tip: For testing, start with 150-200 sample items to validate your pipeline before scaling up!*"""
+    elif "version" in q_low or "npm" in q_low or "git" in q_low or "terminal" in q_low or "command" in q_low:
+        return f"""### 🛠️ Quick Tool Version Checks in Your Code Editor (VS Code)
+
+To check what tools you have installed, open your terminal (press `Ctrl + ~` in VS Code) and run these simple commands:
+
+- **Check Python Version**: `python --version` (or `python3 --version`)
+- **Check Git Version**: `git --version`
+- **Check Node.js Version**: `node --version`
+- **Check npm Version**: `npm --version`
+
+**Helpful Commands:**
+- Install Python libraries: `pip install <package_name>`
+- Install Node packages: `npm install <package_name>`
+- Run a Python file: `python filename.py`
+
+*Note: You do NOT need any Git or complex version control knowledge to build this project! Our roadmap walks you purely through building the project step by step in plain everyday words.*"""
     elif "explain" in q_low or "simple" in q_low or "analogy" in q_low:
         return f"""**{matched_title} Explained Simply:**
 

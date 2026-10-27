@@ -7,10 +7,11 @@ An interactive student project roadmap and AI-powered mentorship application bui
 ## 🚀 Key Features
 
 * **Interactive 7-Step Project Roadmap**: Milestone-driven architecture designed to guide students from environment setup, dataset preparation, core implementation, testing, API development, to portfolio showcase.
+* **EduMentor AI Academic & Career Advisor**: Heuristic student advisory module (`agent/chatbot.py`) providing evidence-based study techniques (Pomodoro, Feynman, Active Recall), tech career roadmaps (AI/ML, Web Dev), exam blueprints, energy & sleep optimization, and score prediction heuristics with interactive suggestion chips.
+* **Dual-Mode Floating AI Mentor**: Pinned widget on the bottom-left (`✨ Ask AI Mentor`) toggling between **EduMentor Advisor** (with dynamic suggestion chips) and **Project Doubt Mentor** (step-specific code, datasets & interview questions).
 * **Detailed Step Execution Briefs**: Click any step in the roadmap to view a focused execution brief with actionable checklists, tool dependencies, copyable starter code snippets, and verification criteria.
-* **Floating IRCTC-Style AI Mentor**: A floating widget pinned to the bottom-left of the screen (`✨ Ask AI Mentor`) that opens a focused doubt-clearing chat interface to answer questions about any project or step.
 * **Project Catalog & Recommender**: Built-in catalog of 50+ curated student projects across AI/ML, Web, Mobile, IoT, Biotechnology, and Engineering with TF-IDF cosine similarity recommendations.
-* **FastAPI Backend Services**: Endpoints for chat (`/chat`), roadmaps (`/roadmap`), doubt clearing (`/doubt`), and catalog lookups (`/hub-roadmap/{project_name}`).
+* **FastAPI Backend Services**: Endpoints for student advisory (`/advisor`), chat (`/chat`), roadmaps (`/roadmap`), doubt clearing (`/doubt`), and catalog lookups (`/hub-roadmap/{project_name}`).
 
 ---
 

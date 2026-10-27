@@ -30,6 +30,7 @@ class ChatRequest(BaseModel):
 
 
 from agent.roadmap import generate_roadmap, answer_project_doubt, get_student_tech_hub_roadmap
+from agent.chatbot import get_chat_response
 
 class RoadmapRequest(BaseModel):
     project_name: str
@@ -42,10 +43,31 @@ class DoubtRequest(BaseModel):
     student: dict[str, Any] = Field(default_factory=dict)
     history: list[dict[str, str]] = Field(default_factory=list)
 
+class AdvisorRequest(BaseModel):
+    message: str
+    context: dict[str, Any] = Field(default_factory=dict)
+
 
 @app.get("/")
 def home():
     return {"message": "AI Student Mentor API is running!"}
+
+
+@app.post("/advisor")
+def advisor(request: AdvisorRequest):
+    try:
+        return get_chat_response(
+            message=request.message,
+            context=request.context
+        )
+    except Exception as error:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(
+            status_code=500,
+            detail=f"{type(error).__name__}: {error}"
+        )
+
 
 
 @app.post("/chat")

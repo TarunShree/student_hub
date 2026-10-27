@@ -9,6 +9,7 @@ from agent.roadmap import (
     find_project_by_name,
     answer_project_doubt
 )
+from agent.chatbot import get_chat_response
 
 # Page Configuration matching Student Tech Hub
 st.set_page_config(
@@ -46,6 +47,27 @@ if "doubt_messages" not in st.session_state:
             "role": "assistant",
             "content": f"👋 Welcome! I am your **AI Project Mentor** for **{st.session_state.active_project}**.\n\nYou can ask me for starter code, dataset sources, architecture design, or interview preparation for any step in your roadmap!"
         }
+    ]
+
+if "advisor_messages" not in st.session_state:
+    st.session_state.advisor_messages = [
+        {
+            "role": "assistant",
+            "content": (
+                "👋 **Hello there!** I'm **EduMentor AI**, your Academic & Career Mentor.\n\n"
+                "I can guide you through evidence-based study techniques, AI/ML & Web career roadmaps, exam preparation blueprints, and performance score optimization.\n\n"
+                "Click on any suggestion below or ask me any question!"
+            )
+        }
+    ]
+
+if "active_advisor_suggestions" not in st.session_state:
+    st.session_state.active_advisor_suggestions = [
+        "Top study techniques",
+        "AI & Machine Learning roadmap",
+        "Full-Stack Web Development roadmap",
+        "How to prepare for final exams",
+        "Explain my predicted performance"
     ]
 
 
@@ -823,13 +845,16 @@ def show_step_brief_dialog(step_data, project_title, skills):
             <p style="font-size: 14px; color: #334155; line-height: 1.6; margin: 0;">{proof_text}</p>
             {f'<div style="margin-top: 12px; padding-top: 10px; border-top: 1px dashed #CBD5E1; font-size: 13px; color: #64748B;">💡 <strong>Pro-Tip:</strong> {tips_text}</div>' if tips_text else ''}
         </div>
+        <div style="background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 10px; padding: 10px 14px; margin-top: 12px; font-size: 12.5px; color: #166534;">
+            💡 <strong>Need commands or tool setup?</strong> If you need commands to check Git, Python, or npm versions in your code editor, just ask our <strong>AI Mentor</strong> in the bottom-left chatbot!
+        </div>
         """, unsafe_allow_html=True)
 
     st.write("")
     col_ask, col_close = st.columns([3, 1])
     with col_ask:
         if st.button(f"💬 Clear Doubts with AI Mentor on Step {s_num}", use_container_width=True, type="primary"):
-            prompt_q = f"I am currently working on Step {s_num}: '{s_title}' for {project_title}. Please give me step-by-step guidance, common pitfalls, and starter advice."
+            prompt_q = f"I am currently working on Step {s_num}: '{s_title}' for {project_title}. Please give me step-by-step guidance, common pitfalls, and starter advice in simple layman's language."
             st.session_state.doubt_messages.append({"role": "user", "content": prompt_q})
             with st.spinner("AI Mentor preparing response..."):
                 resp = answer_project_doubt(
@@ -845,6 +870,23 @@ def show_step_brief_dialog(step_data, project_title, skills):
 
 
 # ---------------- 7-STEP VERTICAL TIMELINE ----------------
+st.markdown("""
+<div style="background: #FFFFFF; border: 1.5px solid #E1E8F4; border-radius: 16px; padding: 16px 22px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; box-shadow: 0 2px 12px rgba(50, 70, 110, 0.03);">
+    <div style="display: flex; align-items: center; gap: 14px;">
+        <span style="font-size: 26px;">🌱</span>
+        <div>
+            <div style="font-size: 14px; font-weight: 800; color: #17233D;">Beginner-Friendly Project Roadmap</div>
+            <div style="font-size: 12.5px; color: #64748B; margin-top: 2px;">
+                This roadmap focuses 100% on the steps to build your project in plain everyday words (zero tech knowledge needed!).
+            </div>
+        </div>
+    </div>
+    <div style="background: #EFF0FF; border: 1px solid #DFE3FF; border-radius: 999px; padding: 8px 16px; font-size: 12px; font-weight: 700; color: #5865F2; white-space: nowrap;">
+        💬 Need tool/version commands? Ask AI Mentor →
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
 st.markdown('<div class="timeline-container"><div class="timeline-vertical-line"></div>', unsafe_allow_html=True)
 
 for idx, step in enumerate(all_steps):
@@ -950,67 +992,131 @@ st.markdown(f"""
 # ---------------- FLOATING IRCTC-STYLE CHATBOT ON THE LEFT ----------------
 # Just like IRCTC (Ask Disha), a small fixed floating icon sits at bottom-left.
 # When clicked, a compact popover chat window opens right there.
-with st.popover("✨ Ask AI Mentor", help="Chat with your dedicated AI Project Mentor"):
-    st.markdown(f"""
-    <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #EEF2F6; padding-bottom: 10px; margin-bottom: 12px;">
-        <div style="display: flex; align-items: center; gap: 8px;">
-            <span style="font-size: 20px;">✨</span>
-            <div>
-                <div style="font-weight: 800; font-size: 15px; color: #17233D;">AI Project Mentor</div>
-                <div style="font-size: 11px; font-weight: 600; color: #16A34A;">🟢 Online · {active_title}</div>
+with st.popover("✨ Ask AI Mentor", help="Chat with EduMentor Advisor or Project Doubts"):
+    # Header with toggle between EduMentor Advisor & Project Doubt Mentor
+    mentor_mode = st.radio(
+        "Select Mentor Mode",
+        ["🎓 EduMentor Advisor", "🛠️ Project Doubts"],
+        horizontal=True,
+        label_visibility="collapsed",
+        key="selected_mentor_mode"
+    )
+
+    quick_choice = None
+
+    if mentor_mode == "🎓 EduMentor Advisor":
+        st.markdown("""
+        <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #EEF2F6; padding-bottom: 10px; margin-bottom: 10px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 20px;">🎓</span>
+                <div>
+                    <div style="font-weight: 800; font-size: 15px; color: #17233D;">EduMentor AI</div>
+                    <div style="font-size: 11px; font-weight: 600; color: #16A34A;">🟢 Online · Academic & Career Advisor</div>
+                </div>
             </div>
         </div>
-    </div>
-    """, unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
 
-    st.markdown(f"""
-    <div style="background: #EFF0FF; border-radius: 8px; padding: 6px 12px; margin-bottom: 12px; font-size: 12px; color: #5865F2; font-weight: 700;">
-        📍 Current Focus: Step {current_step_obj['number']} - {current_step_obj['title']}
-    </div>
-    """, unsafe_allow_html=True)
+        st.markdown("""
+        <div style="font-size: 11px; font-weight: 800; color: #64748B; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 6px;">
+            💡 Suggested Inquiries
+        </div>
+        """, unsafe_allow_html=True)
 
-    # Quick suggestion chips
-    c1, c2 = st.columns(2)
-    quick_choice = None
-    with c1:
-        if st.button("💻 Starter Code", key="pop_starter_code", use_container_width=True):
-            quick_choice = f"Please provide clean, commented starter code for {current_step_obj['title']} of {active_title}."
-        if st.button("📊 Free Datasets", key="pop_datasets", use_container_width=True):
-            quick_choice = f"Where can I find free datasets or public resources to build {active_title}?"
-    with c2:
-        if st.button("💡 Explain Step", key="pop_explain", use_container_width=True):
-            quick_choice = f"Explain {current_step_obj['title']} for {active_title} in simple, beginner terms with an analogy."
-        if st.button("🎯 Interview Qs", key="pop_interview", use_container_width=True):
-            quick_choice = f"What are the top 3 technical interview questions an interviewer will ask about {active_title}?"
+        # Dynamic Suggestion Chips
+        sug_list = st.session_state.active_advisor_suggestions[:4]
+        c1, c2 = st.columns(2)
+        for s_idx, sug_item in enumerate(sug_list):
+            target_col = c1 if s_idx % 2 == 0 else c2
+            with target_col:
+                if st.button(f"✨ {sug_item}", key=f"adv_chip_btn_{s_idx}", use_container_width=True):
+                    quick_choice = sug_item
 
-    # Conversation history display inside popover
-    chat_container = st.container(height=260)
-    with chat_container:
-        for msg in st.session_state.doubt_messages:
-            r = msg["role"]
-            with st.chat_message(r, avatar="✨" if r == "assistant" else "👤"):
-                st.markdown(msg["content"])
+        # Advisor Conversation History
+        chat_container = st.container(height=260)
+        with chat_container:
+            for msg in st.session_state.advisor_messages:
+                r = msg["role"]
+                with st.chat_message(r, avatar="🎓" if r == "assistant" else "👤"):
+                    st.markdown(msg["content"])
 
-    # Chat Input Box
-    user_chat_msg = st.chat_input(f"Ask any doubt about {active_title}...")
+    else:
+        st.markdown(f"""
+        <div style="display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #EEF2F6; padding-bottom: 10px; margin-bottom: 10px;">
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 20px;">🛠️</span>
+                <div>
+                    <div style="font-weight: 800; font-size: 15px; color: #17233D;">AI Project Mentor</div>
+                    <div style="font-size: 11px; font-weight: 600; color: #16A34A;">🟢 Online · {active_title}</div>
+                </div>
+            </div>
+        </div>
+        <div style="background: #EFF0FF; border-radius: 8px; padding: 6px 12px; margin-bottom: 12px; font-size: 12px; color: #5865F2; font-weight: 700;">
+            📍 Current Focus: Step {current_step_obj['number']} - {current_step_obj['title']}
+        </div>
+        """, unsafe_allow_html=True)
+
+        # Quick suggestion chips for Project Doubts
+        c1, c2 = st.columns(2)
+        with c1:
+            if st.button("💻 Starter Code", key="pop_starter_code", use_container_width=True):
+                quick_choice = f"Please provide clean, simple starter code for {current_step_obj['title']} of {active_title} with beginner comments."
+            if st.button("📊 Sample Examples", key="pop_datasets", use_container_width=True):
+                quick_choice = f"Where can I find free sample examples or ingredients to build {active_title}?"
+        with c2:
+            if st.button("💡 Explain Step", key="pop_explain", use_container_width=True):
+                quick_choice = f"Explain {current_step_obj['title']} for {active_title} in simple, beginner terms with an everyday analogy."
+            if st.button("🛠️ Check Versions / Setup", key="pop_versions", use_container_width=True):
+                quick_choice = "How do I check my Git, Python, or npm versions and run commands in my code editor?"
+
+
+        # Conversation history display inside popover
+        chat_container = st.container(height=260)
+        with chat_container:
+            for msg in st.session_state.doubt_messages:
+                r = msg["role"]
+                with st.chat_message(r, avatar="✨" if r == "assistant" else "👤"):
+                    st.markdown(msg["content"])
+
+    # Chat Input Box (Dynamic placeholder depending on mode)
+    input_placeholder = "Ask EduMentor about study methods, career roadmaps, exam prep..." if mentor_mode == "🎓 EduMentor Advisor" else f"Ask any doubt about {active_title}..."
+    user_chat_msg = st.chat_input(input_placeholder)
     active_chat_query = quick_choice or user_chat_msg
 
     if active_chat_query:
-        st.session_state.doubt_messages.append({"role": "user", "content": active_chat_query})
-        with chat_container:
-            with st.chat_message("user", avatar="👤"):
-                st.markdown(active_chat_query)
+        if mentor_mode == "🎓 EduMentor Advisor":
+            st.session_state.advisor_messages.append({"role": "user", "content": active_chat_query})
+            with chat_container:
+                with st.chat_message("user", avatar="👤"):
+                    st.markdown(active_chat_query)
 
-            with st.chat_message("assistant", avatar="✨"):
-                with st.spinner("AI Mentor thinking..."):
-                    mentor_answer = answer_project_doubt(
-                        question=active_chat_query,
-                        project_name=active_title,
-                        student={"department": roadmap_data["category"], "skills": active_skills},
-                        history=st.session_state.doubt_messages[-8:],
-                        current_step=current_step_obj
-                    )
-                    st.markdown(mentor_answer)
+                with st.chat_message("assistant", avatar="🎓"):
+                    with st.spinner("EduMentor AI preparing response..."):
+                        adv_response = get_chat_response(active_chat_query)
+                        mentor_answer = adv_response["reply"]
+                        if adv_response.get("suggestions"):
+                            st.session_state.active_advisor_suggestions = adv_response["suggestions"]
+                        st.markdown(mentor_answer)
 
-        st.session_state.doubt_messages.append({"role": "assistant", "content": mentor_answer})
-        st.rerun()
+            st.session_state.advisor_messages.append({"role": "assistant", "content": mentor_answer})
+            st.rerun()
+        else:
+            st.session_state.doubt_messages.append({"role": "user", "content": active_chat_query})
+            with chat_container:
+                with st.chat_message("user", avatar="👤"):
+                    st.markdown(active_chat_query)
+
+                with st.chat_message("assistant", avatar="✨"):
+                    with st.spinner("AI Mentor thinking..."):
+                        mentor_answer = answer_project_doubt(
+                            question=active_chat_query,
+                            project_name=active_title,
+                            student={"department": roadmap_data["category"], "skills": active_skills},
+                            history=st.session_state.doubt_messages[-8:],
+                            current_step=current_step_obj
+                        )
+                        st.markdown(mentor_answer)
+
+            st.session_state.doubt_messages.append({"role": "assistant", "content": mentor_answer})
+            st.rerun()
+
